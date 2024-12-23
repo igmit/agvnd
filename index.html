@@ -1,0 +1,89 @@
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<div id="app">
+
+    <input-elements :elements="elements"/>
+
+</div>
+
+<script>
+    const {createApp, ref} = Vue
+
+    let app = createApp({
+        setup() {
+            const elements = ref([
+                {id: 1, name: 'Book'},
+                {id: 2, name: 'Pencil'},
+                {id: 3, name: 'Apple'},
+                {id: 4, name: 'Notebook'},
+                {id: 5, name: 'Pen'},
+                {id: 6, name: 'Banana'},
+                {id: 7, name: 'Eraser'},
+                {id: 8, name: 'Orange'},
+                {id: 9, name: 'Marker'},
+                {id: 10, name: 'Laptop'},
+                {id: 1001, name: 'Backpack'},
+                {id: 1002, name: 'Avocado'}
+            ])
+
+            return {
+                elements
+            }
+        }
+    });
+
+    app.component('InputElements',
+        {
+            props: ['elements'],
+            setup(props) {
+
+                // Тут есть простор для оптимизации: предварительная сортировка элементов и поиск по ним
+                const inputText = ref('')
+
+                const displayElements = ref([])
+
+                const searchElements = () => {
+                    displayElements.value = []
+
+                    if (inputText.value.trim() !== "") {
+                        for (let i = 0; i < props.elements.length; i++) {
+                            const el = props.elements[i];
+                            if (el['name'].toLowerCase().indexOf(inputText.value.toLowerCase()) >= 0) {
+                                displayElements.value.push(el)
+                            }
+
+                        }
+                    } else {
+
+                        for (let counter = 0; counter < 10; counter++) {
+                            displayElements.value.push(props.elements[counter])
+                        }
+                    }
+                    
+                    sortElements(displayElements.value)
+                }
+
+                const sortElements = (arr) => {
+                    arr.sort((a, b) => a.name.localeCompare(b.name))
+                }
+
+                searchElements()
+
+                return {
+                    inputText,
+                    displayElements,
+                    searchElements
+                }
+            },
+            template: `
+              <div>
+
+                <input type="text" v-model="inputText" @keyup="searchElements">
+                <div v-for="el in displayElements">{{ el['name'] }}</div>
+              </div>`
+        })
+
+    app.mount('#app')
+
+
+</script>
